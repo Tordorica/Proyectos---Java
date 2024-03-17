@@ -17,6 +17,14 @@ public class Character extends Shape{
 		return this.character;
 	}
 	
+	public Point2D getMovement() {
+		return this.movement;
+	}
+	
+	public void setMovement(Point2D point) {
+		this.movement = point;
+	}
+	
 	public void moveLeft() {
 		if (this.character.getRotate() != 0) {
 		

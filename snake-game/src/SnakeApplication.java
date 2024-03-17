@@ -6,6 +6,8 @@ import javafx.scene.layout.Pane;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
 import javafx.geometry.Bounds;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 
 public class SnakeApplication extends Application{
@@ -21,7 +23,9 @@ public class SnakeApplication extends Application{
 		
 		Character snake = new Character(head);
 		
-		Body body = new Body(layout);
+		int squareSize = 25;
+		Shape square = new Rectangle(WIDTH / 2 - squareSize / 2, HEIGHT / 2 + 15, squareSize, squareSize);
+		Body body = new Body(square);
 		
 		Chef chef = new Chef(layout);
 		chef.cook();
@@ -76,12 +80,18 @@ public class SnakeApplication extends Application{
 				Food food = chef.getFood();
 				if (snake.collide(food)) {
 					
-					body.addTo(snake);
+					body.addTo(snake.getCharacter());
+					body.getCharacter().setRotate(snake.getCharacter().getRotate());
+					body.setMovement(snake.getMovement());
 					layout.getChildren().remove(food);
 					chef.cook();
-					this.stop();
+					layout.getChildren().add(body.getCharacter());
+//					this.stop();
 				
 				};
+				
+				body.move();
+				body.accelerate();
 				
 			}
 		}.start();
