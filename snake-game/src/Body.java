@@ -5,7 +5,7 @@ import javafx.geometry.Point2D;
 
 public class Body extends Character{
 	private Shape body;
-	private Shape snake;
+	private double rotation;
 	
 	
 	public Body(Shape rectangle) {
@@ -13,17 +13,12 @@ public class Body extends Character{
 		this.body = super.getCharacter();
 	}
 	
-	public void addTo(Shape snake) {
-		this.snake = snake;
-		this.body.setTranslateX(snake.getTranslateX());
-		this.body.setTranslateY(snake.getTranslateY());		
-	}
-	
 	public void setRotation(int rotation) {
 		this.body.setRotate(rotation);
 	}
 	
 	public void setMovement(Point2D movement) {
+		movement = movement.add(-25, 0);
 		super.setMovement(movement);
 	}
 }

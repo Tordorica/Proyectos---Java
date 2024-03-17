@@ -8,7 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
-
+import javafx.geometry.Point2D;
 
 public class SnakeApplication extends Application{
 	
@@ -24,7 +24,7 @@ public class SnakeApplication extends Application{
 		Character snake = new Character(head);
 		
 		int squareSize = 25;
-		Shape square = new Rectangle(WIDTH / 2 - squareSize / 2, HEIGHT / 2 + 15, squareSize, squareSize);
+		Shape square = new Rectangle(WIDTH / 2 - squareSize / 2, HEIGHT / 2 - squareSize / 2, squareSize , squareSize );
 		Body body = new Body(square);
 		
 		Chef chef = new Chef(layout);
@@ -80,9 +80,11 @@ public class SnakeApplication extends Application{
 				Food food = chef.getFood();
 				if (snake.collide(food)) {
 					
-					body.addTo(snake.getCharacter());
+					// El orden es importante con estos tres metodos
 					body.getCharacter().setRotate(snake.getCharacter().getRotate());
-					body.setMovement(snake.getMovement());
+					body.setMovement(new Point2D(snake.getCharacter().getTranslateX(), snake.getCharacter().getTranslateY()));
+					
+					
 					layout.getChildren().remove(food);
 					chef.cook();
 					layout.getChildren().add(body.getCharacter());
