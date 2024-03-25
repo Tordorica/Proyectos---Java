@@ -27,41 +27,24 @@ public class Character extends Shape{
 	
 	public void moveLeft() {
 		if (this.character.getRotate() != 0) {
-		
-			if (this.character.getRotate() != -180) {	
-				this.movement = new Point2D(this.character.getTranslateX(), this.character.getTranslateY());
-			}
 			this.character.setRotate(-180);
 		}
 	}
 	
 	public void moveRight() {
 		if (this.character.getRotate() != -180 ) {
-			
-			if (this.character.getRotate() != 0) {
-				this.movement = new Point2D(this.character.getTranslateX(), this.character.getTranslateY());
-			}
 			this.character.setRotate(0);
-		
 		}
 	}
 	
 	public void moveUp() {
 		if (this.character.getRotate() != 90 ) {
-			
-			if (this.character.getRotate() != -90) {
-				this.movement = new Point2D(this.character.getTranslateX(), this.character.getTranslateY());
-			}
 			this.character.setRotate(-90);
 		}
 	}
 	
 	public void moveDown() {
 		if (this.character.getRotate() != -90) {
-			
-			if (this.character.getRotate() != 90) {
-				this.movement = new Point2D(this.character.getTranslateX(), this.character.getTranslateY());
-			}
 			this.character.setRotate(90);
 		}
 	}
@@ -71,14 +54,33 @@ public class Character extends Shape{
 		this.character.setTranslateY(this.movement.getY());
 	}
 	
+//	public void accelerate() {
+//		double accelerateX = Math.cos(Math.toRadians(this.character.getRotate()));
+//		double accelerateY = Math.sin(Math.toRadians(this.character.getRotate()));
+//		
+//		accelerateX *= 3.33;
+//		accelerateY *= 3.33;
+//		
+//		this.movement = movement.add(accelerateX, accelerateY);	
+//	}
+	
 	public void accelerate() {
-		double accelerateX = Math.cos(Math.toRadians(this.character.getRotate()));
-		double accelerateY = Math.sin(Math.toRadians(this.character.getRotate()));
-		
-		accelerateX *= 3.33;
-		accelerateY *= 3.33;
-		
-		this.movement = movement.add(accelerateX, accelerateY);	
+		double accelerationRate = 1.0;
+		if (this.character.getRotate() == -90) {
+			
+			this.movement = movement.add(0, -accelerationRate);
+		}
+		if (this.character.getRotate() == 90) {
+			;
+			this.movement = movement.add(0, accelerationRate);
+		}
+		if (this.character.getRotate() == 0) {
+			
+			this.movement = movement.add(accelerationRate, 0);
+		}
+		if (this.character.getRotate() == -180) {
+			this.movement = movement.add(-accelerationRate, 0);
+		}
 	}
 	
 	public boolean collide(Shape other) {
