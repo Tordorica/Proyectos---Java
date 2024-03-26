@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.RowConstraints;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
 import javafx.geometry.Bounds;
@@ -21,101 +23,61 @@ public class SnakeApplication extends Application{
 	
 	@Override
 	public void start(Stage window) {
-		Pane layout = new Pane();
+		GridPane layout = new GridPane();
 		
-//		Head head = new Head(WIDTH / 2, HEIGHT / 2, 15);
-		
-//		Character snake = new Character(head);
+		for (int row = 1; row < 25; row++) {
+			for (int column = 1; column < 25; column++) {
+				ColumnConstraints columnConstraint = new ColumnConstraints(25);
+				layout.getColumnConstraints().add(columnConstraint);
+			}
+			RowConstraints rowConstraint = new RowConstraints(25);
+			layout.getRowConstraints().add(rowConstraint);
+		}
+	
+		layout.setPrefSize(WIDTH, HEIGHT);		
 
-		List<Body> snakeBody = new ArrayList<>(); 
-		Body head = new Body();
-		snakeBody.add(head);
+		Rectangle square = new Rectangle(25, 25);
+		square.setFill(Color.RED);
 		
-		Chef chef = new Chef(layout);
-		chef.cook();
+//		List<Body> snakeBody = new ArrayList<>(); 
+//		Body head = new Body();
+//		snakeBody.add(head);
 		
-		layout.getChildren().add(snakeBody.get(0).getCharacter());
+//		layout.getChildren().add(snakeBody.get(0).getCharacter());
 				
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		
 		new AnimationTimer() {
+			private int index;
 			
 			@Override
 			public void handle(long now) {
 				
 				scene.setOnKeyPressed((event) -> {
 					if (event.getCode() == KeyCode.UP) {
-						snakeBody.get(0).moveUp();
-						turnBody(snakeBody);
+						
 						System.out.println("up");
 					}
 					if (event.getCode() == KeyCode.DOWN) {
-						snakeBody.get(0).moveDown();
-						turnBody(snakeBody);
+						
 						System.out.println("down");
 					}
 					if (event.getCode() == KeyCode.LEFT) {
-						snakeBody.get(0).moveLeft();
-						turnBody(snakeBody);
+						
 						System.out.println("left");
 					}
 					if (event.getCode() == KeyCode.RIGHT) {
-						snakeBody.get(0).moveRight();
-						turnBody(snakeBody);
+						
 						System.out.println("right");
 					}
 				});
 				
-				// Declarando los limites:
-				// Se detiene cuando choca contra la barrera derecha
-				if (snakeBody.get(0).getCharacter().getTranslateX() + 9.9 > WIDTH / 2) {
-					this.stop();
-				}
-				// Se detiene cuando choca contra la barrera izquierda
-				if (snakeBody.get(0).getCharacter().getTranslateX() - 9.9 < WIDTH / -2) {
-					this.stop();
-				}
-				// Barrera superior
-				if (snakeBody.get(0).getCharacter().getTranslateY() - 9.9 < HEIGHT / -2) {
-					this.stop();
-				}
-				// Barrera inferior
-				if (snakeBody.get(0).getCharacter().getTranslateY() + 9.9 > HEIGHT / 2) {
-					this.stop();
-				}
+				layout.getChildren().remove(square);
 				
-				Food food = chef.getFood();
-				if (snakeBody.get(0).collide(food)) {
-				
-					layout.getChildren().remove(food);
-					chef.cook();
-					
-					Character head = snakeBody.get(snakeBody.size() - 1);
-					snakeBody.add(new Body(head));
-					snakeBody.stream()
-					.filter(body -> {
-						return !(layout.getChildren().contains(body.getCharacter()));
-					})
-					.forEach(body -> {
-						body.setHeadMovement();
-						body.getCharacter().setRotate(body.getHead().getCharacter().getRotate());
-						body.accelerate();
-						body.move();
-						System.out.println("Rotation: " + body.getCharacter().getRotate());
-						layout.getChildren().add(body.getCharacter());
-					});
-					
-					System.out.println(snakeBody.size());
-//					this.stop();
-				
-				}
+				layout.add(square, index, 0);
+				index++;
 
-				snakeBody.stream()
-					.forEach(body -> {
-						body.accelerate();
-						body.move();
-					});
-			}
+			}	
 		}.start();
 		
 		
