@@ -25,8 +25,8 @@ public class SnakeApplication extends Application{
 	public void start(Stage window) {
 		GridPane layout = new GridPane();
 		
-		for (int row = 1; row < 25; row++) {
-			for (int column = 1; column < 25; column++) {
+		for (int row = 0; row < 24; row++) {
+			for (int column = 0; column < 24; column++) {
 				ColumnConstraints columnConstraint = new ColumnConstraints(25);
 				layout.getColumnConstraints().add(columnConstraint);
 			}
@@ -36,47 +36,51 @@ public class SnakeApplication extends Application{
 	
 		layout.setPrefSize(WIDTH, HEIGHT);		
 
-		Rectangle square = new Rectangle(25, 25);
-		square.setFill(Color.RED);
+		List<Character> snakeBody = new ArrayList<>(); 
+		Character body = new Character(new Rectangle(25, 25));
+		snakeBody.add(body);
 		
-//		List<Body> snakeBody = new ArrayList<>(); 
-//		Body head = new Body();
-//		snakeBody.add(head);
-		
-//		layout.getChildren().add(snakeBody.get(0).getCharacter());
+		layout.getChildren().add(snakeBody.get(0).getCharacter());
 				
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		
 		new AnimationTimer() {
-			private int index;
+			private int x;
+			private int y;
 			
+			private long startTime = System.nanoTime();
 			@Override
 			public void handle(long now) {
-				
-				scene.setOnKeyPressed((event) -> {
-					if (event.getCode() == KeyCode.UP) {
-						
-						System.out.println("up");
-					}
-					if (event.getCode() == KeyCode.DOWN) {
-						
-						System.out.println("down");
-					}
-					if (event.getCode() == KeyCode.LEFT) {
-						
-						System.out.println("left");
-					}
-					if (event.getCode() == KeyCode.RIGHT) {
-						
-						System.out.println("right");
-					}
-				});
-				
-				layout.getChildren().remove(square);
-				
-				layout.add(square, index, 0);
-				index++;
 
+				if ((now - startTime) >= 250_000_000) {
+					startTime = now;
+					layout.getChildren().remove(snakeBody.get(0).getCharacter());
+					
+					scene.setOnKeyPressed((event) -> {
+						if (event.getCode() == KeyCode.UP) {
+							snakeBody.get(0).moveUp();
+							System.out.println("up");
+						}
+						if (event.getCode() == KeyCode.DOWN) {
+							snakeBody.get(0).moveDown();
+							System.out.println("down");
+						}
+						if (event.getCode() == KeyCode.LEFT) {
+							snakeBody.get(0).moveLeft();
+							System.out.println("left");
+						}
+						if (event.getCode() == KeyCode.RIGHT) {
+							snakeBody.get(0).moveRight();
+							System.out.println("right");
+						}
+					});
+					
+					snakeBody.stream().forEach(body -> {
+						x += body.getMovement().getX();
+						y += body.getMovement().getY();
+						layout.add(body.getCharacter(), x, y);
+					});
+				}
 			}	
 		}.start();
 		
@@ -84,15 +88,6 @@ public class SnakeApplication extends Application{
 		window.setScene(scene);
 		window.show();
 	}
-	
-	public void turnBody(List<Body> body) {
-		for (int i = 1; body.size() > i; i++) {
-			double rotation = body.get(i).getHead().getCharacter().getRotate();
-			body.get(i).getCharacter().setRotate(rotation);
-			body.get(i).setHeadMovement();
-		}
-	}
-	
 	
 	public static void main(String[] args) {
 		System.out.println("Hola");
