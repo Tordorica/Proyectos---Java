@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Arrays;
 
 
 public class testing {
@@ -9,7 +11,12 @@ public class testing {
 		nums.add(0);
 		nums.add(1);
 		nums.add(2);
-		nums.add(0, 3);
+		nums.add(3);
+		System.out.println(nums);
+		
+		Collections.reverse(nums);
+		System.out.println(nums);
+		Collections.reverse(nums);
 		System.out.println(nums);
 		
 		}

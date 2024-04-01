@@ -1,20 +1,24 @@
 
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.GridPane;
 
 import java.util.Random;
 
 public class Chef {
-	private Pane layout;
+	private GridPane layout;
 	private Food food;
 	
-	public Chef(Pane layout) {
+	public Chef(GridPane layout) {
 		this.layout = layout;
 	}
 	
 	public void cook() {
+		this.food = new Food(12.5, 12.5, 7);
+		
 		Random random = new Random();
-		this.food = new Food (random.nextInt(560) + 20, random.nextInt(560) + 20, 5);
-		this.layout.getChildren().add(this.food);
+		int randomX = random.nextInt(22 + 1);
+		int randomY = random.nextInt(22 + 1);
+		System.out.println("Food(x,y): " + randomX + ", " + randomY);
+		this.layout.add(this.food, randomX, randomY);
 	}
 	
 	public Food getFood() {
