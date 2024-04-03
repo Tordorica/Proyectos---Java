@@ -52,12 +52,13 @@ public class SnakeApplication extends Application{
 		new AnimationTimer() {
 			private int x;
 			private int y;
+			private long time = 200_000_000;
 			
 			private long startTime = System.nanoTime();
 			@Override
 			public void handle(long now) {
 
-				if ((now - startTime) >= 250_000_000) {
+				if ((now - startTime) >= time) {
 					startTime = now;
 					
 					layout.getChildren().stream()
@@ -71,23 +72,40 @@ public class SnakeApplication extends Application{
 								layout.getChildren().remove(bodyPart.getCharacter());
 							}
 						});
-					Collections.reverse(snakeBody);
+
+					// Aca suscede la magia
+					Character lastBody = snakeBody.get(snakeBody.size() - 1);
+					Point2D firstBodyMovement = snakeBody.get(0).getMovement();
+					lastBody.setMovement(firstBodyMovement);
+					snakeBody.remove(lastBody);
+					snakeBody.add(0, lastBody);
 					
 					scene.setOnKeyPressed((event) -> {
+						double currentX = snakeBody.get(0).getMovement().getX();
+						double currentY = snakeBody.get(0).getMovement().getY();
+						
 						if (event.getCode() == KeyCode.UP) {
-							snakeBody.get(0).moveUp();
+							if (currentY != 1) {
+								snakeBody.get(0).moveUp();
+							}
 							System.out.println("up");
 						}
 						if (event.getCode() == KeyCode.DOWN) {
-							snakeBody.get(0).moveDown();
+							if (currentY != -1) {
+								snakeBody.get(0).moveDown();
+							}
 							System.out.println("down");
 						}
 						if (event.getCode() == KeyCode.LEFT) {
-							snakeBody.get(0).moveLeft();
+							if (currentX != 1) {
+								snakeBody.get(0).moveLeft();
+							}
 							System.out.println("left");
 						}
 						if (event.getCode() == KeyCode.RIGHT) {
-							snakeBody.get(0).moveRight();
+							if (currentX != -1) {
+								snakeBody.get(0).moveRight();
+							}
 							System.out.println("right");
 						}
 					});
@@ -97,9 +115,19 @@ public class SnakeApplication extends Application{
 						snakeBody.add(new Character(new Rectangle(25, 25)));
 						layout.add(snakeBody.get(snakeBody.size() - 1).getCharacter(), x, y);
 						randomFood.cook();
-						System.out.println(x + ", " + y);
-						this.stop();
+						long rate = 10_000_000 / snakeBody.size();
+						time -= rate;
+						System.out.println(rate);
+//						System.out.println(x + ", " + y);
+//						this.stop();
 					}
+					
+//					layout.getChildren().stream()
+//					.forEach(bodyPart -> {
+//						if (snakeBody.get(0).collide((Shape) bodyPart) && !(bodyPart.equals(snakeBody.get(0).getCharacter()))) {
+//							this.stop();
+//						}
+//					});
 					
 					for (int i = 0; snakeBody.size() > i; i++) {
 						if (i == 0) {
@@ -116,8 +144,6 @@ public class SnakeApplication extends Application{
 						snakeBody.get(i).getCharacter().setId(String.valueOf(i + 1));
 						layout.add(snakeBody.get(i).getCharacter(), x, y);
 					}
-					
-					
 				}
 			}	
 		}.start();
