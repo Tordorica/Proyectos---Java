@@ -21,6 +21,13 @@ public class Character extends Shape{
 		return this.movement;
 	}
 	
+//	public Character getById(String id) {
+//		if (this.character.getId().equals(id)) {
+//			return this;
+//		}
+//		return null;
+//	}
+		
 	public void setMovement(Point2D point) {
 		this.movement = point;
 	}

@@ -39,9 +39,9 @@ public class SnakeApplication extends Application{
 		layout.setPrefSize(WIDTH, HEIGHT);		
 
 		List<Character> snakeBody = new ArrayList<>(); 
+		
 		Character body = new Character(new Rectangle(25, 25));
 		snakeBody.add(body);
-		
 		snakeBody.get(0).getCharacter().setId("1");
 		
 		Chef randomFood = new Chef(layout);
@@ -53,6 +53,8 @@ public class SnakeApplication extends Application{
 			private int x;
 			private int y;
 			private long time = 200_000_000;
+			
+			private Character head;
 			
 			private long startTime = System.nanoTime();
 			@Override
@@ -108,26 +110,24 @@ public class SnakeApplication extends Application{
 							}
 							System.out.println("right");
 						}
-					});
+					});	
 					
 					if (snakeBody.get(0).collide(randomFood.getFood())) {
 						layout.getChildren().remove(randomFood.getFood());
 						snakeBody.add(new Character(new Rectangle(25, 25)));
+//						Character tail = snakeBody.get(snakeBody.size() - 1);
 						layout.add(snakeBody.get(snakeBody.size() - 1).getCharacter(), x, y);
 						randomFood.cook();
+						// Game Speed
 						long rate = 10_000_000 / snakeBody.size();
 						time -= rate;
 						System.out.println(rate);
-//						System.out.println(x + ", " + y);
-//						this.stop();
+						System.out.println(x + ", " + y);
+						if (snakeBody.size() == 3) {
+							this.stop();
+						}
+						
 					}
-					
-//					layout.getChildren().stream()
-//					.forEach(bodyPart -> {
-//						if (snakeBody.get(0).collide((Shape) bodyPart) && !(bodyPart.equals(snakeBody.get(0).getCharacter()))) {
-//							this.stop();
-//						}
-//					});
 					
 					for (int i = 0; snakeBody.size() > i; i++) {
 						if (i == 0) {
@@ -142,8 +142,26 @@ public class SnakeApplication extends Application{
 						}
 						
 						snakeBody.get(i).getCharacter().setId(String.valueOf(i + 1));
+						
 						layout.add(snakeBody.get(i).getCharacter(), x, y);
 					}
+					
+					
+					snakeBody.stream()
+					.forEach(bodyPart -> {
+						if (bodyPart.getCharacter().getId().equals("1")) {
+							head = bodyPart;	
+						}
+					});
+					snakeBody.stream()
+					.filter(bodyPart -> {
+						return !(this.head.getCharacter().equals(bodyPart.getCharacter()));
+					})
+					.forEach(bodyPart -> {
+						if (this.head.collide(bodyPart.getCharacter())) {
+							this.stop();
+						}
+					});
 				}
 			}	
 		}.start();
