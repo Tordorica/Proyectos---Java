@@ -1,7 +1,10 @@
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -11,12 +14,13 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.RowConstraints;
 import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
-import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class SnakeApplication extends Application{
 	
@@ -26,6 +30,7 @@ public class SnakeApplication extends Application{
 	@Override
 	public void start(Stage window) {
 		GridPane layout = new GridPane();
+		layout.setStyle("-fx-background-color: #000;");
 		
 		for (int row = 0; row < 24; row++) {
 			for (int column = 0; column < 24; column++) {
@@ -37,10 +42,22 @@ public class SnakeApplication extends Application{
 		}
 	
 		layout.setPrefSize(WIDTH, HEIGHT);		
-
+		
+		AtomicInteger counter = new AtomicInteger(0);
+		
+		Text points = new Text("Points : 0");
+		points.setFont(new Font(18).font("Arial", FontWeight.BOLD, 18));
+		points.setFill(Color.WHITE);
+		layout.add(points, 0, 0);
+		
+		Text gameOver = new Text("Game over!");
+		gameOver.setFont(new Font(60));
+		gameOver.setFill(Color.RED);
+		
+		Color snakeColor = Color.GREEN;
 		List<Character> snakeBody = new ArrayList<>(); 
 		
-		Character body = new Character(new Rectangle(25, 25));
+		Character body = new Character(new Rectangle(25, 25, snakeColor));
 		snakeBody.add(body);
 		snakeBody.get(0).getCharacter().setId("1");
 		
@@ -50,11 +67,9 @@ public class SnakeApplication extends Application{
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		
 		new AnimationTimer() {
-			private int x;
-			private int y;
+			private int x = 11;
+			private int y = 11;
 			private long time = 200_000_000;
-			
-			private Character head;
 			
 			private long startTime = System.nanoTime();
 			@Override
@@ -63,8 +78,17 @@ public class SnakeApplication extends Application{
 				if ((now - startTime) >= time) {
 					startTime = now;
 					
+					// Si la serpiente se sale del tablero, el juego se detiene.
+					Point2D currentMovement = snakeBody.get(0).getMovement();
+					if (((x + currentMovement.getX()) == 24 || (y + currentMovement.getY() == 24)) || ((x + currentMovement.getX()) == -1 || y + currentMovement.getY() == -1)) {
+						layout.add(gameOver, 6, 10);
+						
+						this.stop();
+						return;
+					}
+					
 					layout.getChildren().stream()
-					.filter(child -> !(child instanceof Circle))
+					.filter(child -> child instanceof Rectangle)
 					.forEach(bodyPart -> {
 						bodyPart.setId(String.valueOf((Integer.valueOf(bodyPart.getId()) + 1)));
 					});
@@ -112,20 +136,39 @@ public class SnakeApplication extends Application{
 						}
 					});	
 					
+					HashSet<Point2D> coordinates = new HashSet<>();
+				
+					layout.getChildren().stream()
+					.filter(child -> {
+						return child instanceof Rectangle;
+					})
+					.forEach(child -> {
+//						System.out.println(child.getId() + ": " + GridPane.getColumnIndex(child) + ", " + GridPane.getRowIndex(child));
+						Point2D coordinate = new Point2D(GridPane.getColumnIndex(child), GridPane.getRowIndex(child));
+						coordinates.add(coordinate);
+					});
+						
+					Point2D futureHeadPosition = new Point2D(x + snakeBody.get(0).getMovement().getX(), y + snakeBody.get(0).getMovement().getY());
+					// Si la posicion futura de la cabeza coincide con una parte del cuerpo, el juego se detiene.
+					if (!coordinates.add(futureHeadPosition)) {
+						layout.add(gameOver, 6, 10);
+						this.stop();
+					}
+					
 					if (snakeBody.get(0).collide(randomFood.getFood())) {
 						layout.getChildren().remove(randomFood.getFood());
-						snakeBody.add(new Character(new Rectangle(25, 25)));
-//						Character tail = snakeBody.get(snakeBody.size() - 1);
-						layout.add(snakeBody.get(snakeBody.size() - 1).getCharacter(), x, y);
+						
+						counter.getAndAdd(10);
+						points.setText("Points : " + counter.get());
+					
+						snakeBody.add(new Character(new Rectangle(25, 25, snakeColor)));						
+	
 						randomFood.cook();
+						
 						// Game Speed
-						long rate = 10_000_000 / snakeBody.size();
+						long rate = 10_000_000 / (snakeBody.size() / 2);
 						time -= rate;
 						System.out.println(rate);
-						System.out.println(x + ", " + y);
-						if (snakeBody.size() == 3) {
-							this.stop();
-						}
 						
 					}
 					
@@ -142,27 +185,10 @@ public class SnakeApplication extends Application{
 						}
 						
 						snakeBody.get(i).getCharacter().setId(String.valueOf(i + 1));
-						
-						layout.add(snakeBody.get(i).getCharacter(), x, y);
+					
+						layout.add(snakeBody.get(i).getCharacter(), x, y);	
 					}
-					
-					
-					snakeBody.stream()
-					.forEach(bodyPart -> {
-						if (bodyPart.getCharacter().getId().equals("1")) {
-							head = bodyPart;	
-						}
-					});
-					snakeBody.stream()
-					.filter(bodyPart -> {
-						return !(this.head.getCharacter().equals(bodyPart.getCharacter()));
-					})
-					.forEach(bodyPart -> {
-						if (this.head.collide(bodyPart.getCharacter())) {
-							this.stop();
-						}
-					});
-				}
+				}	
 			}	
 		}.start();
 		

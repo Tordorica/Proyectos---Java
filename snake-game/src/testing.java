@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Arrays;
 
+import javafx.geometry.Point2D;
+
 
 public class testing {
 
@@ -18,6 +20,11 @@ public class testing {
 		System.out.println(nums);
 		Collections.reverse(nums);
 		System.out.println(nums);
+		
+		Point2D point1 = new Point2D(1.0, 2.0);
+		Point2D point2 = new Point2D(3.0, 2.0);
+		
+		System.out.println(point1.equals(point2));
 		
 		}
 }	

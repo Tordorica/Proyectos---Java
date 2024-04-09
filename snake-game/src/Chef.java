@@ -12,7 +12,7 @@ public class Chef {
 	}
 	
 	public void cook() {
-		this.food = new Food(12.5, 12.5, 7);
+		this.food = new Food(12.5, 12.5, 8);
 		
 		Random random = new Random();
 		int randomX = random.nextInt(22 + 1);
