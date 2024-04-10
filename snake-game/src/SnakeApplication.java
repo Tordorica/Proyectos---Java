@@ -61,8 +61,10 @@ public class SnakeApplication extends Application{
 		snakeBody.add(body);
 		snakeBody.get(0).getCharacter().setId("1");
 		
-		Chef randomFood = new Chef(layout);
+		Chef randomFood = new Chef();
 		randomFood.cook();
+		Point2D location = randomFood.getLocation();
+		layout.add(randomFood.getFood(), (int) location.getX(), (int) location.getY());
 		
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		
@@ -155,6 +157,7 @@ public class SnakeApplication extends Application{
 						this.stop();
 					}
 					
+					//Si la cabeza de la serpiente colisiona con comida, se agrega 1.
 					if (snakeBody.get(0).collide(randomFood.getFood())) {
 						layout.getChildren().remove(randomFood.getFood());
 						
@@ -162,8 +165,13 @@ public class SnakeApplication extends Application{
 						points.setText("Points : " + counter.get());
 					
 						snakeBody.add(new Character(new Rectangle(25, 25, snakeColor)));						
-	
+						
+						//Si la ubicacion de la comida no coicide con la de la serpiente, agregarla al tablero.
 						randomFood.cook();
+						Point2D location = randomFood.getLocation();
+						if (coordinates.add(location)) {
+							layout.add(randomFood.getFood(), (int) location.getX(), (int) location.getY());
+						}
 						
 						// Game Speed
 						long rate = 10_000_000 / (snakeBody.size() / 2);
